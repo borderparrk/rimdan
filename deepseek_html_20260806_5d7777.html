@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>استعلام نوبت</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Tahoma', 'Segoe UI', sans-serif;
+            background: #434343;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        .top-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #434343;
+            padding: 6px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .top-header .header-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+        }
+
+        .top-header .header-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .top-header .header-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .top-header .header-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: #ffffff;
+        }
+
+        .container {
+            background: #ffffff;
+            width: 100%;
+            max-width: 650px;
+            padding: 16px 14px 16px 14px;
+            border-radius: 0 0 16px 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid #dce3ec;
+            border-top: none;
+            margin-top: 44px;
+            margin-bottom: 16px;
+        }
+
+        .info-box {
+            background: #f8fafc;
+            border: 2px solid #b0b8c4;
+            border-radius: 10px;
+            padding: 3px 12px;
+            margin-bottom: 6px;
+            transition: 0.15s;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            overflow: hidden;
+            height: auto;
+            min-height: 36px;
+        }
+
+        .info-box:last-of-type {
+            margin-bottom: 0;
+        }
+
+        .info-box.highlight {
+            border: 3px solid #1a1a1a;
+            background: #f5f7fa;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            min-height: 38px;
+        }
+
+        .label {
+            display: block;
+            font-size: 10px;
+            font-weight: 500;
+            color: #8899aa;
+            margin-bottom: 0px;
+            letter-spacing: 0.2px;
+            line-height: 1.2;
+        }
+
+        .value {
+            display: block;
+            width: 100%;
+            font-size: 13px;
+            font-weight: 700;
+            color: #0b1f33;
+            background: transparent;
+            border: none;
+            padding: 0px 0;
+            font-family: 'Tahoma', 'Segoe UI', sans-serif;
+            outline: none;
+            transition: 0.15s;
+            direction: ltr;
+            unicode-bidi: embed;
+            text-align: right;
+            line-height: 1.3;
+        }
+
+        .value.persian-only {
+            direction: rtl;
+            unicode-bidi: embed;
+            text-align: right;
+        }
+
+        .value.plate-free {
+            direction: rtl;
+            unicode-bidi: plaintext;
+            text-align: right;
+            font-family: 'Tahoma', 'Segoe UI', 'Arial', sans-serif;
+            text-transform: none;
+            letter-spacing: normal;
+        }
+
+        .value:focus {
+            color: #0b1f33;
+            border-bottom: 2px solid #6d8eb0;
+        }
+
+        .value.serial-green {
+            color: #1d7a3e;
+            font-weight: 700;
+        }
+
+        .value.status-black {
+            color: #000000;
+            font-weight: 700;
+        }
+
+        .value.status-active {
+            color: #1d7a3e;
+            font-weight: 700;
+        }
+
+        .value.status-inactive {
+            color: #ac3a3a;
+            font-weight: 700;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 14px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            flex: 1;
+            min-width: 80px;
+            padding: 9px 6px;
+            border: none;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            background: #eef3f9;
+            color: #1f3d5c;
+            cursor: pointer;
+            transition: 0.15s;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+        }
+
+        .btn-primary {
+            background: #1a5fb0;
+            color: white;
+            box-shadow: 0 4px 10px rgba(26, 95, 176, 0.2);
+        }
+
+        .btn-primary:hover {
+            background: #124a8a;
+            transform: scale(1.01);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid #cddae9;
+        }
+
+        .btn-outline:hover {
+            background: #f3f8ff;
+            border-color: #8aa3c0;
+        }
+
+        .btn-success {
+            background: #1f8b4c;
+            color: white;
+            box-shadow: 0 4px 10px rgba(31, 139, 76, 0.18);
+        }
+
+        .btn-success:hover {
+            background: #16733d;
+        }
+
+        .btn-danger {
+            background: #b33a3a;
+            color: white;
+            box-shadow: 0 4px 10px rgba(179, 58, 58, 0.2);
+        }
+
+        .btn-danger:hover {
+            background: #8f2d2d;
+        }
+
+        .note {
+            margin-top: 12px;
+            padding: 8px 12px;
+            background: #f7faff;
+            border-radius: 12px;
+            border-right: 4px solid #6d8eb0;
+            font-size: 11px;
+            color: #3f5a77;
+        }
+
+        .save-message {
+            display: none;
+            background: #1d7a3e;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 12px;
+        }
+
+        .save-message.show {
+            display: block;
+            animation: fadeInOut 2s ease;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(-10px); }
+            20% { opacity: 1; transform: translateY(0); }
+            80% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        @media (max-width: 768px) {
+            .container { max-width: 100%; padding: 14px 12px; margin-top: 42px; }
+            .top-header { padding: 5px 14px; }
+            .top-header .header-title { font-size: 18px; }
+            .top-header .header-icon { width: 30px; height: 30px; }
+            .top-header .header-icon svg { width: 20px; height: 20px; }
+            .info-box { padding: 3px 10px; min-height: 34px; margin-bottom: 5px; }
+            .info-box.highlight { min-height: 36px; }
+            .value { font-size: 12px; }
+            .label { font-size: 9px; }
+            .btn { font-size: 12px; padding: 8px 5px; min-width: 70px; }
+            .note { font-size: 10px; padding: 6px 10px; }
+        }
+
+        @media (max-width: 480px) {
+            .container { padding: 12px 10px; margin-top: 40px; border-radius: 0 0 12px 12px; margin-bottom: 12px; }
+            .top-header { padding: 4px 12px; }
+            .top-header .header-title { font-size: 16px; }
+            .top-header .header-icon { width: 26px; height: 26px; }
+            .top-header .header-icon svg { width: 18px; height: 18px; }
+            .info-box { padding: 2px 8px; min-height: 30px; margin-bottom: 4px; border-radius: 8px; }
+            .info-box.highlight { min-height: 32px; border-width: 2.5px; }
+            .value { font-size: 11px; line-height: 1.2; }
+            .label { font-size: 8px; line-height: 1.1; }
+            .actions { gap: 6px; margin-top: 12px; }
+            .btn { font-size: 11px; padding: 7px 4px; min-width: 60px; border-radius: 25px; }
+            .note { font-size: 10px; padding: 6px 8px; margin-top: 10px; border-right-width: 3px; }
+        }
+
+        @media (max-width: 360px) {
+            .container { padding: 10px 8px; margin-top: 36px; }
+            .top-header { padding: 3px 10px; }
+            .top-header .header-title { font-size: 14px; }
+            .top-header .header-icon { width: 24px; height: 24px; }
+            .top-header .header-icon svg { width: 16px; height: 16px; }
+            .info-box { padding: 2px 6px; min-height: 26px; margin-bottom: 3px; border-radius: 6px; border-width: 1.5px; }
+            .info-box.highlight { min-height: 28px; border-width: 2px; }
+            .value { font-size: 10px; }
+            .label { font-size: 7px; }
+            .btn { font-size: 10px; padding: 6px 3px; min-width: 50px; }
+            .note { font-size: 9px; padding: 4px 6px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-header">
+        <span class="header-title">استعلام نوبت</span>
+        <div class="header-icon" onclick="goHome()" title="بازگشت به صفحه اصلی">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 3L2 12H5V20H10V14H14V20H19V12H22L12 3Z"/>
+            </svg>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <div class="info-box highlight">
+            <span class="label">سریال نوبت</span>
+            <input class="value serial-green" type="text" id="serial" value="">
+        </div>
+
+        <div class="info-box">
+            <span class="label">نام مرز</span>
+            <input class="value persian-only" type="text" id="border" value="">
+        </div>
+
+        <div class="info-box">
+            <span class="label">نوع صف</span>
+            <input class="value persian-only" type="text" id="queueType" value="">
+        </div>
+
+        <div class="info-box">
+            <span class="label">شماره پلاک</span>
+            <input class="value plate-free" type="text" id="plate" value="" placeholder="هر متنی...">
+        </div>
+
+        <div class="info-box">
+            <span class="label">نوع نوبت</span>
+            <input class="value persian-only" type="text" id="apptType" value="">
+        </div>
+
+        <div class="info-box">
+            <span class="label">زمان دریافت نوبت</span>
+            <input class="value" type="text" id="receivedAt" value="">
+        </div>
+
+        <div class="info-box">
+            <span class="label">وضعیت</span>
+            <input class="value status-black persian-only" type="text" id="status" value="">
+        </div>
+
+        <div class="info-box">
+            <span class="label">تیرپارک</span>
+            <input class="value persian-only" type="text" id="tirePark" value="">
+        </div>
+
+        <div class="info-box">
+            <span class="label">شماره سرویس</span>
+            <input class="value" type="text" id="serviceNo" value="">
+        </div>
+
+        <div class="info-box">
+            <span class="label">زمان ورود به تیرپارک</span>
+            <input class="value" type="text" id="entryTime" value="">
+        </div>
+
+        <div class="info-box">
+            <span class="label">زمان فراخوان</span>
+            <input class="value" type="text" id="callTime" value="">
+        </div>
+
+        <div class="info-box">
+            <span class="label">زمان خروج از تیرپارک</span>
+            <input class="value" type="text" id="exitTime" value="">
+        </div>
+
+        <div class="info-box">
+            <span class="label">زمان مجاز ورود به گمرک</span>
+            <input class="value" type="text" id="customsTime" value="">
+        </div>
+
+        <div id="saveMessage" class="save-message">✅ اطلاعات با موفقیت ذخیره شد!</div>
+
+        <div class="actions">
+            <button class="btn btn-primary" onclick="saveData()">💾 ذخیره اطلاعات</button>
+            <button class="btn btn-outline" onclick="resetToDefault()">↺ بازنشانی به پیش‌فرض</button>
+            <button class="btn btn-success" onclick="toggleStatus()">🔄 تغییر وضعیت</button>
+            <button class="btn btn-danger" onclick="clearAllData()">🗑️ پاک کردن همه</button>
+        </div>
+
+        <div class="note">
+            💡 <strong>نکته:</strong> کادر شماره پلاک آزاد است و هر نوع نوشته‌ای (اعداد، حروف، کاراکترهای خاص) را می‌پذیرد.
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEYS = {
+            serial: 'appointment_serial',
+            border: 'appointment_border',
+            queueType: 'appointment_queueType',
+            plate: 'appointment_plate',
+            apptType: 'appointment_apptType',
+            receivedAt: 'appointment_receivedAt',
+            status: 'appointment_status',
+            tirePark: 'appointment_tirePark',
+            serviceNo: 'appointment_serviceNo',
+            entryTime: 'appointment_entryTime',
+            callTime: 'appointment_callTime',
+            exitTime: 'appointment_exitTime',
+            customsTime: 'appointment_customsTime'
+        };
+
+        const defaultData = {
+            serial: "BN050501155",
+            border: "ریمدان",
+            queueType: "بازارچه - تخلیه تانکر (گاز)",
+            plate: "95-115ع46",
+            apptType: "اینترنتی",
+            receivedAt: "11:52 1405-05-11",
+            status: "خارج شده از تیرپارک",
+            tirePark: "بادپا",
+            serviceNo: "44690",
+            entryTime: "11:52 1405-05-11",
+            callTime: "10:30 1405-05-15",
+            exitTime: "11:44 1405-05-15",
+            customsTime: "23:44 1405-05-16"
+        };
+
+        function loadData() {
+            for (const [key, storageKey] of Object.entries(STORAGE_KEYS)) {
+                const savedValue = localStorage.getItem(storageKey);
+                const element = document.getElementById(key);
+                if (savedValue !== null && element) {
+                    element.value = savedValue;
+                } else if (element) {
+                    element.value = defaultData[key] || '';
+                }
+            }
+            updateStatusStyle(document.getElementById('status').value);
+        }
+
+        function saveData() {
+            for (const [key, storageKey] of Object.entries(STORAGE_KEYS)) {
+                const element = document.getElementById(key);
+                if (element) {
+                    localStorage.setItem(storageKey, element.value.trim());
+                }
+            }
+            showSaveMessage();
+        }
+
+        function showSaveMessage() {
+            const msg = document.getElementById('saveMessage');
+            msg.classList.remove('show');
+            void msg.offsetWidth;
+            msg.classList.add('show');
+            setTimeout(() => {
+                msg.classList.remove('show');
+            }, 2000);
+        }
+
+        function resetToDefault() {
+            if (confirm('آیا مطمئن هستید که می‌خواهید همه مقادیر را به حالت پیش‌فرض برگردانید؟')) {
+                for (const [key, storageKey] of Object.entries(STORAGE_KEYS)) {
+                    localStorage.setItem(storageKey, defaultData[key]);
+                    const element = document.getElementById(key);
+                    if (element) {
+                        element.value = defaultData[key];
+                    }
+                }
+                updateStatusStyle(defaultData.status);
+                showSaveMessage();
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('⚠️ آیا مطمئن هستید که می‌خواهید همه داده‌های ذخیره شده را پاک کنید؟ این عمل غیرقابل بازگشت است!')) {
+                for (const storageKey of Object.values(STORAGE_KEYS)) {
+                    localStorage.removeItem(storageKey);
+                }
+                loadData();
+                showSaveMessage();
+                const msg = document.getElementById('saveMessage');
+                msg.textContent = '🗑️ همه داده‌ها پاک شدند!';
+                setTimeout(() => {
+                    msg.textContent = '✅ اطلاعات با موفقیت ذخیره شد!';
+                }, 2000);
+            }
+        }
+
+        function toggleStatus() {
+            const statusInput = document.getElementById('status');
+            const current = statusInput.value.trim();
+            let newStatus;
+
+            if (current === 'فعال') {
+                newStatus = 'غیرفعال';
+            } else if (current === 'غیرفعال') {
+                newStatus = 'خارج شده از تیرپارک';
+            } else {
+                newStatus = 'فعال';
+            }
+
+            statusInput.value = newStatus;
+            updateStatusStyle(newStatus);
+            saveData();
+        }
+
+        function updateStatusStyle(status) {
+            const statusInput = document.getElementById('status');
+            statusInput.classList.remove('status-active', 'status-inactive', 'status-black');
+
+            if (status === 'فعال') {
+                statusInput.classList.add('status-active');
+            } else if (status === 'غیرفعال') {
+                statusInput.classList.add('status-inactive');
+            } else if (status === 'خارج شده از تیرپارک') {
+                statusInput.classList.add('status-black');
+            }
+        }
+
+        function goHome() {
+            alert('🏠 بازگشت به صفحه اصلی');
+        }
+
+        window.onload = function() {
+            loadData();
+        };
+    </script>
+
+</body>
+</html>
